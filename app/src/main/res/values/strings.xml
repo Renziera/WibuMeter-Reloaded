@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">WibuMeter Reloaded</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">History</string>
+    <string name="title_home">Realtime</string>
+    <string name="title_dashboard">Photo</string>
     <string name="title_notifications">About</string>
     <string name="title_activity_ad">AdActivity</string>
     <string name="action_settings">Settings</string>

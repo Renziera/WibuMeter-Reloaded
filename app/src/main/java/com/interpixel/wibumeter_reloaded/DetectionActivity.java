@@ -23,6 +23,7 @@ import android.util.SparseIntArray;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.google.firebase.ml.vision.FirebaseVision;
@@ -51,8 +52,8 @@ public class DetectionActivity extends AppCompatActivity {
     private CameraCaptureSession captureSession;
     private String[] cameraId;  //kamera depan atau belakang (atau samping wkwk)
     private boolean surfaceReady = false;
-    private boolean cameraReady = false;
     private boolean isPreviewing = false;
+    private boolean useFrontCamera;
 
     private void toast(String s){
         Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
@@ -62,6 +63,10 @@ public class DetectionActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detection);
+
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        useFrontCamera = getIntent().getBooleanExtra("front", false);
 
         //Siapin options face detector
         FirebaseVisionFaceDetectorOptions realTimeOptions = new FirebaseVisionFaceDetectorOptions.Builder()
@@ -145,7 +150,11 @@ public class DetectionActivity extends AppCompatActivity {
         }else{
             Log.d(TAG, "Camera permission granted");
             try {
-                cameraManager.openCamera(cameraId[0], cameraStateCallback, new Handler());
+                if(useFrontCamera && cameraId.length > 1){
+                    cameraManager.openCamera(cameraId[1], cameraStateCallback, new Handler());
+                }else{
+                    cameraManager.openCamera(cameraId[0], cameraStateCallback, new Handler());
+                }
             }catch (CameraAccessException e){
                 toast("Error accessing camera");
                 e.printStackTrace();
@@ -178,7 +187,7 @@ public class DetectionActivity extends AppCompatActivity {
             captureSession.close();
             captureSession = null;
         }
-        cameraReady = false;
+        isPreviewing = false;
         if(cameraDevice != null){
             cameraDevice.close();
             cameraDevice = null;

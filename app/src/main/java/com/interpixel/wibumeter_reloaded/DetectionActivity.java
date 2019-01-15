@@ -9,6 +9,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Rect;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
@@ -26,9 +27,13 @@ import android.view.SurfaceView;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata;
+import com.google.firebase.ml.vision.face.FirebaseVisionFace;
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetector;
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions;
 
@@ -253,10 +258,38 @@ public class DetectionActivity extends AppCompatActivity {
     }
 
     private void parseFromCamera(Image mediaImage, int rotation){
+
         image = FirebaseVisionImage.fromMediaImage(mediaImage, rotation);
 
+        Task<List<FirebaseVisionFace>> result =
+                detector.detectInImage(image)
+                        .addOnSuccessListener(
+                                new OnSuccessListener<List<FirebaseVisionFace>>() {
+                                    @Override
+                                    public void onSuccess(List<FirebaseVisionFace> faces) {
+                                        processResult(faces);
+                                    }
+                                })
+                        .addOnFailureListener(
+                                new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                });
     }
 
+    private void processResult(List<FirebaseVisionFace> faces){
+        for(FirebaseVisionFace face : faces){
+            Rect bounds = face.getBoundingBox();
+            float rotY = face.getHeadEulerAngleY();  // Head is rotated to the right rotY degrees
+            float rotZ = face.getHeadEulerAngleZ();  // Head is tilted sideways rotZ degrees
+
+            if (face.getTrackingId() != FirebaseVisionFace.INVALID_ID) {
+                int id = face.getTrackingId();
+            }
+        }
+    }
 
 
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();

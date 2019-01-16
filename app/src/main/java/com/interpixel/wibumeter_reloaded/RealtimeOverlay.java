@@ -51,6 +51,7 @@ public class RealtimeOverlay {
         paint.setColor(Color.BLUE);
         paint.setStrokeWidth(5);
         paint.setStyle(Paint.Style.STROKE);
+        paint.setTextSize(50);
     }
 
     public void processResult(List<FirebaseVisionFace> faces){
@@ -69,6 +70,7 @@ public class RealtimeOverlay {
                 if (face.getTrackingId() != FirebaseVisionFace.INVALID_ID) {
                     int id = face.getTrackingId();
                     Log.d("Hmm", "face id " + id + " " + bounds.toString() + " rotY: " + rotY + " rotZ: " + rotZ);
+                    canvas.drawText("" + id, bounds.left, bounds.bottom, paint);
                 }
                 paint.setColor(Color.BLUE);//TODO random color
                 canvas.drawRect(bounds, paint);

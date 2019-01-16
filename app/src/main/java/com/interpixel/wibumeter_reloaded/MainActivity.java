@@ -1,6 +1,5 @@
 package com.interpixel.wibumeter_reloaded;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -11,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import android.view.MenuItem;
-import android.view.View;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -23,16 +21,16 @@ public class MainActivity extends AppCompatActivity {
             Fragment fragment;
             switch (item.getItemId()) {
                 case R.id.navigation_home:
-                    fragment = new HomeFragment();
+                    fragment = new RealtimeFragment();
                     break;
                 case R.id.navigation_history:
-                    fragment = new HistoryFragment();
+                    fragment = new PhotoFragment();
                     break;
                 case R.id.navigation_about:
                     fragment = new AboutFragment();
                     break;
                 default:
-                    fragment = new HomeFragment();
+                    fragment = new RealtimeFragment();
                     break;
             }
             getSupportFragmentManager()
@@ -56,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
 
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.fragment_container, new HomeFragment())
+                .replace(R.id.fragment_container, new RealtimeFragment())
                 .commit();
     }
 

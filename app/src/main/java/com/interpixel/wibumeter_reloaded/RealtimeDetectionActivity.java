@@ -43,7 +43,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DetectionActivity extends AppCompatActivity {
+public class RealtimeDetectionActivity extends AppCompatActivity {
 
     private static final String TAG = "Hmm";
     private static final int PERMISSION_REQ_CAM = 1412;
@@ -310,7 +310,7 @@ public class DetectionActivity extends AppCompatActivity {
         isDetecting = true;
         int rotation = getRotationCompensation(cameraId, this, this);
 
-        image = FirebaseVisionImage.fromMediaImage(mediaImage, rotation);
+        image = FirebaseVisionImage.fromMediaImage(mediaImage, FirebaseVisionImageMetadata.ROTATION_0);
         Log.d(TAG, "Image Size "  + mediaImage.getWidth() + " " + mediaImage.getHeight());
         mediaImage.close();
 

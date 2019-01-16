@@ -66,6 +66,7 @@ public class DetectionActivity extends AppCompatActivity {
     private boolean isPreviewing = false;
     private boolean useFrontCamera;
     private boolean isDetecting; //cuma kirim new frame kalo yg terakhir udh selesai diproses
+    private RealtimeOverlay overlay;
     private int totalFrame, detectedFrame;
 
     private void toast(String s){
@@ -80,6 +81,8 @@ public class DetectionActivity extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         useFrontCamera = getIntent().getBooleanExtra("front", false);
+
+        overlay = new RealtimeOverlay((SurfaceView) findViewById(R.id.overlay));
 
         //Siapin options face detector
         FirebaseVisionFaceDetectorOptions realTimeOptions = new FirebaseVisionFaceDetectorOptions.Builder()
@@ -132,6 +135,7 @@ public class DetectionActivity extends AppCompatActivity {
         //region Siapin surface view (untuk preview kamera)
         surfaceView = findViewById(R.id.surfaceView);
         surfaceHolder = surfaceView.getHolder();
+        surfaceHolder.setKeepScreenOn(true);
         surfaceHolderCallback = new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
@@ -156,10 +160,10 @@ public class DetectionActivity extends AppCompatActivity {
         surfaceHolder.addCallback(surfaceHolderCallback);
         //endregion
 
-        //Siapin imageReader
-        //width & height image yg beneran bakal ngikutin hasil preview kamera, kalo yg di set dsni lebih
-        //rendah malah lag gk jelas. Hopefully device dengan kamera resolusi tinggi punya processing power
-        //yang gede juga buat ngimbangin
+        //region Siapin imageReader
+        //width & height image yg beneran bakal ngikutin hasil preview kamera, kalo yg di set di sini lebih
+        //rendah dari hasil kamera malah lag gk jelas. Hopefully device dengan kamera resolusi tinggi punya
+        //processing power yang gede juga buat ngimbangin wkwk.
         imageReader = ImageReader.newInstance(3840, 2160, ImageFormat.YUV_420_888, 20);
         detectionSurface = imageReader.getSurface();
         imageReader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener() {
@@ -171,12 +175,12 @@ public class DetectionActivity extends AppCompatActivity {
                     if(isDetecting){
                         image.close(); //buang frame
                     }else{
-                        Log.d(TAG, "Image Size "  + image.getWidth() + " " + image.getHeight());
                         parseFromCamera(image);
                     }
                 }
             }
         }, new Handler());
+        //endregion
     }
 
     @Override
@@ -307,12 +311,13 @@ public class DetectionActivity extends AppCompatActivity {
         int rotation = getRotationCompensation(cameraId, this, this);
 
         image = FirebaseVisionImage.fromMediaImage(mediaImage, rotation);
+        Log.d(TAG, "Image Size "  + mediaImage.getWidth() + " " + mediaImage.getHeight());
         mediaImage.close();
 
         detector.detectInImage(image).addOnSuccessListener(new OnSuccessListener<List<FirebaseVisionFace>>() {
                                     @Override
                                     public void onSuccess(List<FirebaseVisionFace> faces) {
-                                        processResult(faces);
+                                        overlay.processResult(faces);
                                         isDetecting = false;
                                         detectedFrame++;
                                         Log.d(TAG, "Detection success " + detectedFrame + " from " + totalFrame);
@@ -324,18 +329,6 @@ public class DetectionActivity extends AppCompatActivity {
                                         isDetecting = false;
                                     }
                                 });
-    }
-
-    private void processResult(List<FirebaseVisionFace> faces){
-        for(FirebaseVisionFace face : faces){
-            Rect bounds = face.getBoundingBox();
-            float rotY = face.getHeadEulerAngleY();  // Head is rotated to the right rotY degrees
-            float rotZ = face.getHeadEulerAngleZ();  // Head is tilted sideways rotZ degrees
-
-            if (face.getTrackingId() != FirebaseVisionFace.INVALID_ID) {
-                int id = face.getTrackingId();
-            }
-        }
     }
 
 
@@ -364,6 +357,7 @@ public class DetectionActivity extends AppCompatActivity {
         CameraManager cameraManager = (CameraManager) context.getSystemService(CAMERA_SERVICE);
         int sensorOrientation = 0;
         try {
+            //noinspection ConstantConditions
             sensorOrientation = cameraManager
                     .getCameraCharacteristics(cameraId)
                     .get(CameraCharacteristics.SENSOR_ORIENTATION);

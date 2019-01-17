@@ -1,5 +1,6 @@
 package com.interpixel.wibumeter_reloaded;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -9,7 +10,11 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.MenuItem;
+
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -56,6 +61,40 @@ public class MainActivity extends AppCompatActivity {
                 .beginTransaction()
                 .replace(R.id.fragment_container, new RealtimeFragment())
                 .commit();
+
+        setDivergence();
+    }
+
+    private void setDivergence(){
+
+        Random random = new Random();
+
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        String value = sp.getString("divergence", "");
+
+        if(value.isEmpty()){    //Pertama kali buka app
+            StringBuilder sb = new StringBuilder();
+            sb.append("0 . 1 7 3 ");
+            sb.append(random.nextInt(10));
+            sb.append(" ");
+            sb.append(random.nextInt(10));
+            sb.append(" ");
+            sb.append(random.nextInt(10));
+            sb.append(" ");
+            sb.append(random.nextInt(10));
+            value = sb.toString();
+        }else{      //randomly changes last two digits every time app starts
+            if(random.nextBoolean() && random.nextBoolean()){
+                StringBuilder sb = new StringBuilder(value);
+                sb.replace(14, 17, random.nextInt(10) + " " + random.nextInt(10));
+                value = sb.toString();
+            }else if(random.nextBoolean()){
+                StringBuilder sb = new StringBuilder(value);
+                sb.replace(16, 17, random.nextInt(10) + "");
+                value = sb.toString();            }
+        }
+
+        sp.edit().putString("divergence", value).apply();
     }
 
 }

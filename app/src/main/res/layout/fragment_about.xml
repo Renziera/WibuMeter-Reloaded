@@ -1,14 +1,200 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AboutFragment">
+    tools:context=".AboutFragment" >
 
-    <!-- TODO: Update blank fragment layout -->
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:src="@mipmap/ic_launcher_round"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adViewAbout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="WibuMeter ReLoaded"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView2" />
 
-</FrameLayout>
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="8dp"
+        android:text="v1.3.3.7-WorldLineBeta"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/adViewAbout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView2">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
+                android:text="Divergence clock"
+                android:textColor="@android:color/black"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/divergence"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="serif-monospace"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:text="0 . 1 7 3 0 0 3 4"
+                android:textAlignment="center"
+                android:textColor="?attr/colorError"
+                android:textSize="36sp" />
+
+            <TextView
+                android:id="@+id/textView7"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="What is WibuMeter ?"
+                android:textColor="@android:color/black"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/textView8"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:lineSpacingExtra="4sp"
+                android:text="WibuMeter is a measurement apparatus that can measure someone's weeb level. " />
+
+            <TextView
+                android:id="@+id/textView9"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="How does WibuMeter work ?"
+                android:textColor="@android:color/black"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/textView10"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
+                android:lineSpacingExtra="4sp"
+                android:text="It's a very long explanation.\nWibuMeter is based on researchs and papers done by\nProf. Raven Quano, M.W.\nHe's currently a lecturer in DIKE (Departement of Idol Kokoro Encore) which is part of FMIPA (Fakultas Meme dan Ikatan Pecinta Anime) at UGM.\nIf you want to know the exact details, I suggest you read his works.\nI'll try to cut it short.\nFirstly, you need to know about the unit 'Wibu' which has no dimension as it is the comparison between the energy exerted by a subject to do weeb stuff over the total energy it has. (Joule/Joule) It ranges between 0.0 and 1.0. WibuMeter focuses on three combined component. There's the past, present, and future component. Traversing time is dependant of the divergence between worldline as a slight difference can result in a totally different scenario because of the butterfly effect." />
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:lineSpacingExtra="4sp"
+                android:text="Each component consist of metadata and a vector. This vector has a magnitude, which is the Wibu earlier and a direction, which is the region where the magnitude tend to extends toward in the weeb-boson field with regular weeb as the axiom and denial weeb at the opposite side. WibuMeter then normalize this three vectors along with several corrections  and outputs a value between 0 and 9999. This final result is the weeb level or also known as onion level to the untrained eye. Why 9999 you ask? So you can shout IT'S OVER NINE THOUSAND!!! of course :)" />
+
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:lineSpacingExtra="4sp"
+                android:text="The weeb level always fluctuates as the subject weeb level is always changing. It depends on a lot of factors and cannot be guaranteed to be the same at any given time.\nBut still, the results produced by WibuMeter are still considered approximates. Prof. Raven is still working on better methods. Currently the most extravagant method consist of accelerating Fluct Lights around the Flux Capacitor, and then relay it to the Steins;Gate." />
+
+            <TextView
+                android:id="@+id/textView11"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="How accurate is WibuMeter ?"
+                android:textColor="@android:color/black"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/textView12"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:lineSpacingExtra="4sp"
+                android:text="Well, the realtime on-the-fly measurement is quite innacurate. It might take a while for the figures to settle down and it is highly dependant on your device's processing power.\nTo get the most accurate result, you can use the photo measurement, and make sure there's only one subject present. Multiple subjects can disorient the result as the weeb field produced can interfere with each other and collide causing superposition if the weeb fields are of different types and/or constructive/destructive weeb wave pattern if they're of the same type." />
+
+            <TextView
+                android:id="@+id/textView13"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Does WibuMeter send out data ?"
+                android:textColor="@android:color/black"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/textView14"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:lineSpacingExtra="4sp"
+                android:text="No, we don't collect any data.\nAlthough it's very tempting to collect anonymous data for research, we decided not to. We believe that weeb level is something personal and we respect privacy." />
+
+            <TextView
+                android:id="@+id/textView15"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Afterwords"
+                android:textColor="@android:color/black"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/textView16"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:lineSpacingExtra="4sp"
+                android:text="Hello, my name is Renz. I'm a student, ILKOMP '18 (Ilmu Komputasi Oppai, Meme, dan Perwibuan) I made this WibuMeter so that people can measure their own or their friend's weeb level. Either just for fun or expose some denials. I hope this WibuMeter helps ISEKAI MIPA members to train harder in order to defeat GAMABUNTA. I believe we can, because we have Okka, the weebest weeb of 'em all.\n\nEl Psy Congroo." />
+
+            <ProgressBar
+                android:id="@+id/progressBarDummy"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

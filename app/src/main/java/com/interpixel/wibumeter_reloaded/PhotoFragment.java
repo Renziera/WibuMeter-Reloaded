@@ -13,6 +13,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -89,6 +90,7 @@ public class PhotoFragment extends Fragment {
 
         progressBar = view.findViewById(R.id.progressBar);
         progressBar.setProgress(0);
+        progressBar.setSecondaryProgress(0);
         status = view.findViewById(R.id.status);
         imageView = view.findViewById(R.id.imageView);
         view.findViewById(R.id.pickButton).setOnClickListener(new View.OnClickListener() {
@@ -126,7 +128,7 @@ public class PhotoFragment extends Fragment {
             bitmap = BitmapFactory.decodeFile(filePath);
             imageView.setImageBitmap(bitmap);
 
-            progressBar.setProgress(20);
+            progressBar.setSecondaryProgress(50);
             status.setText("Photo ready to be analyzed.");
             photoExist = true;
         }
@@ -165,8 +167,20 @@ public class PhotoFragment extends Fragment {
                             status.setText("Photo analyzing failed.");
                         }
                     });
-            progressBar.setProgress(40);
+            progressBar.setSecondaryProgress(progressBar.getMax());
+            progressBar.setProgress(0);
             status.setText("Analyzing photo.");
+            final Handler handler = new Handler();
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    if(progressBar.getProgress() < 100){
+                        progressBar.incrementProgressBy(2);
+                        status.setText("Analyzing photo " + progressBar.getProgress() + " %");
+                        handler.postDelayed(this, 100);
+                    }
+                }
+            });
         }else{
             status.setText("No photo selected.");
         }
@@ -177,21 +191,23 @@ public class PhotoFragment extends Fragment {
             status.setText("Photo analyzing completed. No weeb detected.");
         }
         Log.d("Hmm", "Face detected " + faces.size());
+        paint.setColor(Color.BLUE); //Yang pertama selalu biru
         for(FirebaseVisionFace face : faces){
-            paint.setColor(Color.BLUE); //TODO random color
+
             Rect rect = face.getBoundingBox();
             float rotY = face.getHeadEulerAngleY();
             float rotZ = face.getHeadEulerAngleZ();
             float smile = face.getSmilingProbability();
             float leftEye = face.getLeftEyeOpenProbability();
             float rightEye = face.getRightEyeOpenProbability();
+            canvas.drawRect(rect, paint);
+            Log.d("Hmm", "FACE: " + face.toString());
             List<FirebaseVisionPoint> allContourPoints = face.getContour(FirebaseVisionFaceContour.ALL_POINTS).getPoints();
 
             for(FirebaseVisionPoint point : allContourPoints){
                 canvas.drawPoint(point.getX(), point.getY(), paint);
             }
-            canvas.drawRect(rect, paint);
-
+            paint.setColor(Color.BLUE); //TODO random color
         }
     }
 }

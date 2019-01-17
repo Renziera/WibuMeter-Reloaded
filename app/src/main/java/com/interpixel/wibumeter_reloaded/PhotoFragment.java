@@ -4,9 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -34,7 +32,9 @@ import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetector;
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions;
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceLandmark;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Random;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -77,10 +77,8 @@ public class PhotoFragment extends Fragment {
         paint = new Paint();
         paint.setColor(Color.BLUE);
         paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(3);
-
-        canvas = new Canvas();
-
+        paint.setStrokeWidth(5);
+        paint.setTextSize(20);
     }
 
     @Override
@@ -114,23 +112,19 @@ public class PhotoFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
 
         if(requestCode == REQ_IMAGE && resultCode == Activity.RESULT_OK){
-            //Ngasal banget ini lmao
-            Uri imageUri = data.getData();
-            Log.d("Hmm", "imageUri: " + imageUri.toString());
-            String[] filePathColumn = {MediaStore.Images.Media.DATA};
-            Cursor cursor = getActivity().getContentResolver().query(imageUri, null, null, null,null);
-            cursor.moveToFirst();
-            //int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-            String filePath = cursor.getString(0);
-            filePath = filePath.substring(4);
-            Log.d("Hmm", "filepath: " + filePath);
-                        cursor.close();
-            bitmap = BitmapFactory.decodeFile(filePath);
-            imageView.setImageBitmap(bitmap);
 
-            progressBar.setSecondaryProgress(50);
-            status.setText("Photo ready to be analyzed.");
-            photoExist = true;
+            Uri imageUri = data.getData();
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), imageUri);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }finally {
+                imageView.setImageBitmap(bitmap);
+                progressBar.setSecondaryProgress(50);
+                progressBar.setProgress(0);
+                status.setText("Photo ready to be analyzed.");
+                photoExist = true;
+            }
         }
     }
 
@@ -174,7 +168,7 @@ public class PhotoFragment extends Fragment {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    if(progressBar.getProgress() < 100){
+                    if(progressBar.getProgress() < 98){
                         progressBar.incrementProgressBy(2);
                         status.setText("Analyzing photo " + progressBar.getProgress() + " %");
                         handler.postDelayed(this, 100);
@@ -189,9 +183,13 @@ public class PhotoFragment extends Fragment {
     private void processResult(List<FirebaseVisionFace> faces){
         if(faces.size() == 0){
             status.setText("Photo analyzing completed. No weeb detected.");
+            return;
         }
-        Log.d("Hmm", "Face detected " + faces.size());
-        paint.setColor(Color.BLUE); //Yang pertama selalu biru
+        //Harus mutable bitmap
+        Bitmap drawingBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        canvas = new Canvas(drawingBitmap);
+        canvas.drawBitmap(bitmap, 0, 0, null);
+
         for(FirebaseVisionFace face : faces){
 
             Rect rect = face.getBoundingBox();
@@ -200,14 +198,62 @@ public class PhotoFragment extends Fragment {
             float smile = face.getSmilingProbability();
             float leftEye = face.getLeftEyeOpenProbability();
             float rightEye = face.getRightEyeOpenProbability();
+
+            paint.setStyle(Paint.Style.STROKE);
             canvas.drawRect(rect, paint);
-            Log.d("Hmm", "FACE: " + face.toString());
+
+            FirebaseVisionFaceLandmark mouth = face.getLandmark(FirebaseVisionFaceLandmark.MOUTH_BOTTOM);
+            FirebaseVisionFaceLandmark left_eye = face.getLandmark(FirebaseVisionFaceLandmark.LEFT_EYE);
+            FirebaseVisionFaceLandmark right_eye = face.getLandmark(FirebaseVisionFaceLandmark.RIGHT_EYE);
+            FirebaseVisionFaceLandmark nose = face.getLandmark(FirebaseVisionFaceLandmark.NOSE_BASE);
+
+            String wibu = "";
+
+            if(mouth == null || left_eye == null || right_eye == null || nose == null){
+                wibu = "INVALID";
+            }else{
+                wibu = "" + (int) Math.ceil(Math.abs(
+                        mouth.getPosition().getX() * mouth.getPosition().getY() +
+                        left_eye.getPosition().getX() * left_eye.getPosition().getY() +
+                        right_eye.getPosition().getX() * right_eye.getPosition().getY() +
+                        nose.getPosition().getX() * nose.getPosition().getY()
+                )) % 10000;
+            }
+
+            setTextSize(paint, rect.width(), wibu);
+            paint.setStyle(Paint.Style.FILL);
+            canvas.drawText(wibu, rect.left, rect.bottom + paint.getFontMetrics().descent - paint.getFontMetrics().ascent, paint);
+
             List<FirebaseVisionPoint> allContourPoints = face.getContour(FirebaseVisionFaceContour.ALL_POINTS).getPoints();
 
             for(FirebaseVisionPoint point : allContourPoints){
                 canvas.drawPoint(point.getX(), point.getY(), paint);
             }
-            paint.setColor(Color.BLUE); //TODO random color
+
+            Random random = new Random();
+            paint.setARGB(255, random.nextInt(256), random.nextInt(256), random.nextInt(256));
         }
+
+        imageView.setImageBitmap(drawingBitmap);
+    }
+
+    private void setTextSize(Paint paint, float desiredWidth, String text) {
+
+        // Pick a reasonably large value for the test. Larger values produce
+        // more accurate results, but may cause problems with hardware
+        // acceleration. But there are workarounds for that, too; refer to
+        // http://stackoverflow.com/questions/6253528/font-size-too-large-to-fit-in-cache
+        final float testTextSize = 24f;
+
+        // Get the bounds of the text, using our testTextSize.
+        paint.setTextSize(testTextSize);
+        Rect bounds = new Rect();
+        paint.getTextBounds(text, 0, text.length(), bounds);
+
+        // Calculate the desired size as a proportion of our testTextSize.
+        float desiredTextSize = testTextSize * desiredWidth / bounds.width();
+
+        // Set the paint for that size.
+        paint.setTextSize(desiredTextSize);
     }
 }

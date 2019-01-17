@@ -255,7 +255,13 @@ public class RealtimeDetectionActivity extends AppCompatActivity {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED){
                 Log.d(TAG, "Camera permission granted");
                 try {
-                    cameraManager.openCamera(cameraIds[0], cameraStateCallback, new Handler());
+                    //kalo ternyata gak ada kamera depan, tetep pake yg belakang
+                    if(useFrontCamera && cameraIds.length > 1){
+                        cameraId = cameraIds[1];
+                    }else{
+                        cameraId = cameraIds[0];
+                    }
+                    cameraManager.openCamera(cameraId, cameraStateCallback, new Handler());
                 }catch (CameraAccessException e){
                     toast("Error accessing camera");
                     e.printStackTrace();

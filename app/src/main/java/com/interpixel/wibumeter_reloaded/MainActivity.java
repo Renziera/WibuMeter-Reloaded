@@ -20,10 +20,10 @@ public class MainActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             Fragment fragment;
             switch (item.getItemId()) {
-                case R.id.navigation_home:
+                case R.id.navigation_realtime:
                     fragment = new RealtimeFragment();
                     break;
-                case R.id.navigation_history:
+                case R.id.navigation_photo:
                     fragment = new PhotoFragment();
                     break;
                 case R.id.navigation_about:
@@ -46,8 +46,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        getSupportActionBar().setIcon(R.drawable.ic_home_black_24dp);
-        getSupportActionBar().setLogo(R.drawable.ic_dashboard_black_24dp);
+        getSupportActionBar().setIcon(R.drawable.ic_photo_camera_black_24dp);
+        getSupportActionBar().setLogo(R.drawable.ic_photo_camera_black_24dp);
 
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);

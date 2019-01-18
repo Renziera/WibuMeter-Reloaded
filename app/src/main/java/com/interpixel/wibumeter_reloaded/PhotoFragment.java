@@ -9,6 +9,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -40,6 +41,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 
 public class PhotoFragment extends Fragment {
@@ -79,6 +81,9 @@ public class PhotoFragment extends Fragment {
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(5);
         paint.setTextSize(20);
+
+        Typeface tf = ResourcesCompat.getFont(getContext(), R.font.maven_pro_medium);
+        paint.setTypeface(tf);
     }
 
     @Override
@@ -191,14 +196,14 @@ public class PhotoFragment extends Fragment {
         canvas.drawBitmap(bitmap, 0, 0, null);
 
         for(FirebaseVisionFace face : faces){
-
-            Rect rect = face.getBoundingBox();
+            /**
             float rotY = face.getHeadEulerAngleY();
             float rotZ = face.getHeadEulerAngleZ();
             float smile = face.getSmilingProbability();
             float leftEye = face.getLeftEyeOpenProbability();
             float rightEye = face.getRightEyeOpenProbability();
-
+             */
+            Rect rect = face.getBoundingBox();
             paint.setStyle(Paint.Style.STROKE);
             canvas.drawRect(rect, paint);
 

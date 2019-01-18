@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,6 +18,25 @@ import android.view.MenuItem;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        getSupportActionBar().setIcon(R.drawable.ic_photo_camera_black_24dp);
+        getSupportActionBar().setLogo(R.drawable.ic_photo_camera_black_24dp);
+
+        BottomNavigationView navigation = findViewById(R.id.navigation);
+        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+        //always start with realtime fragment
+        navigation.setSelectedItemId(R.id.navigation_realtime);
+
+        setDivergence();
+
+        MobileAds.initialize(this, "ca-app-pub-6204912690888371~3472410188");
+    }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -45,25 +65,6 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
     };
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        getSupportActionBar().setIcon(R.drawable.ic_photo_camera_black_24dp);
-        getSupportActionBar().setLogo(R.drawable.ic_photo_camera_black_24dp);
-
-        BottomNavigationView navigation = findViewById(R.id.navigation);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fragment_container, new RealtimeFragment())
-                .commit();
-
-        setDivergence();
-    }
 
     private void setDivergence(){
 

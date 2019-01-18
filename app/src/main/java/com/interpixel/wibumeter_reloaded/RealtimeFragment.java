@@ -7,6 +7,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+
 import androidx.fragment.app.Fragment;
 
 public class RealtimeFragment extends Fragment {
@@ -21,6 +24,13 @@ public class RealtimeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_realtime, container, false);
+
+        AdView adView1 = view.findViewById(R.id.adViewRealtime1);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        adView1.loadAd(adRequest);
+
+        AdView adView2 = view.findViewById(R.id.adViewRealtime2);
+        adView2.loadAd(new AdRequest.Builder().build());
 
         testButton = view.findViewById(R.id.testButton);
         testButton.setOnClickListener(new View.OnClickListener() {

@@ -5,7 +5,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.RadioGroup;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -14,7 +15,7 @@ import androidx.fragment.app.Fragment;
 
 public class RealtimeFragment extends Fragment {
 
-    private Button testButton;
+    private ImageButton startRealtimeButton;
 
     public RealtimeFragment() {
         // Required empty public constructor
@@ -32,21 +33,16 @@ public class RealtimeFragment extends Fragment {
         AdView adView2 = view.findViewById(R.id.adViewRealtime2);
         adView2.loadAd(new AdRequest.Builder().build());
 
-        testButton = view.findViewById(R.id.testButton);
-        testButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), RealtimeDetectionActivity.class);
-                startActivity(intent);
-            }
-        });
+        final RadioGroup radioCam = view.findViewById(R.id.radio_cam);
 
-        Button frontcam = view.findViewById(R.id.frontcam);
-        frontcam.setOnClickListener(new View.OnClickListener() {
+        startRealtimeButton = view.findViewById(R.id.startRealtime);
+        startRealtimeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), RealtimeDetectionActivity.class);
-                intent.putExtra("front", true);
+                if(radioCam.getCheckedRadioButtonId() == R.id.radio_front_cam){
+                    intent.putExtra("front", true);
+                }
                 startActivity(intent);
             }
         });

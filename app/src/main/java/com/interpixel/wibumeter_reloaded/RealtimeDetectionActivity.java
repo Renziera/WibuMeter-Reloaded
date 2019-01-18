@@ -9,8 +9,8 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.ImageFormat;
-import android.graphics.Rect;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
@@ -31,7 +31,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata;
@@ -67,6 +66,8 @@ public class RealtimeDetectionActivity extends AppCompatActivity {
     private boolean useFrontCamera;
     private boolean isDetecting; //cuma kirim new frame kalo yg terakhir udh selesai diproses
     private RealtimeOverlay overlay;
+    private boolean isLandscape, isInit = true;
+    private int width, height;
     private int totalFrame, detectedFrame;
 
     private void toast(String s){
@@ -79,10 +80,16 @@ public class RealtimeDetectionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detection);
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        int orientation = getResources().getConfiguration().orientation;
+        if(orientation == Configuration.ORIENTATION_LANDSCAPE){
+            isLandscape = true;
+        }
 
         useFrontCamera = getIntent().getBooleanExtra("front", false);
 
-        overlay = new RealtimeOverlay((SurfaceView) findViewById(R.id.overlay));
+        overlay = new RealtimeOverlay((SurfaceView) findViewById(R.id.overlay), this);
 
         //Siapin options face detector
         FirebaseVisionFaceDetectorOptions realTimeOptions = new FirebaseVisionFaceDetectorOptions.Builder()
@@ -100,13 +107,16 @@ public class RealtimeDetectionActivity extends AppCompatActivity {
         cameraManager = (CameraManager) getSystemService(CAMERA_SERVICE);
         try {
             cameraIds = cameraManager.getCameraIdList();
-            for (String id : cameraIds){
-                Log.d(TAG, "Camera Id: " + id);
-            }
         }catch (CameraAccessException e){
             toast("Error accessing camera");
             e.printStackTrace();
             finish();
+        }
+        //kalo ternyata gak ada kamera depan, tetep pake yg belakang
+        if(useFrontCamera && cameraIds.length > 1){
+            cameraId = cameraIds[1];
+        }else{
+            cameraId = cameraIds[0];
         }
         cameraStateCallback = new CameraDevice.StateCallback() {
             @Override
@@ -141,14 +151,13 @@ public class RealtimeDetectionActivity extends AppCompatActivity {
             public void surfaceCreated(SurfaceHolder holder) {
                 Log.d(TAG, "surfaceCreated");
                 previewSurface = holder.getSurface();
+                surfaceReady = true;
+                startPreviewCamera();
             }
 
             @Override
             public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-                Log.d(TAG, "surfaceChanged");
-                previewSurface = holder.getSurface();
-                surfaceReady = true;
-                startPreviewCamera();
+                Log.d("Hmm", "surfaceChanged: " + format + " width: " + width + " height: " + height);
             }
 
             @Override
@@ -171,6 +180,18 @@ public class RealtimeDetectionActivity extends AppCompatActivity {
             public void onImageAvailable(ImageReader reader) {
                 Image image = reader.acquireLatestImage();
                 if(image != null){
+                    if(isInit){
+                        width = image.getWidth();
+                        height = image.getHeight();
+                        if(isLandscape){
+                            surfaceHolder.setFixedSize(width, height);
+                            overlay.setSurfaceSize(width, height);
+                        }else{
+                            surfaceHolder.setFixedSize(height, width);
+                            overlay.setSurfaceSize(height, width);
+                        }
+                        isInit = false;
+                    }
                     totalFrame++;
                     if(isDetecting){
                         image.close(); //buang frame
@@ -194,12 +215,6 @@ public class RealtimeDetectionActivity extends AppCompatActivity {
         }else{
             Log.d(TAG, "Camera permission granted");
             try {
-                //kalo ternyata gak ada kamera depan, tetep pake yg belakang
-                if(useFrontCamera && cameraIds.length > 1){
-                    cameraId = cameraIds[1];
-                }else{
-                    cameraId = cameraIds[0];
-                }
                 cameraManager.openCamera(cameraId, cameraStateCallback, new Handler());
             }catch (CameraAccessException e){
                 toast("Error accessing camera");
@@ -207,16 +222,6 @@ public class RealtimeDetectionActivity extends AppCompatActivity {
                 finish();
             }
         }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
     }
 
     @Override
@@ -228,6 +233,8 @@ public class RealtimeDetectionActivity extends AppCompatActivity {
             try {
                 captureSession.stopRepeating();
             } catch (CameraAccessException e) {
+                e.printStackTrace();
+            } catch (IllegalStateException e){
                 e.printStackTrace();
             }
             captureSession.close();
@@ -255,12 +262,6 @@ public class RealtimeDetectionActivity extends AppCompatActivity {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED){
                 Log.d(TAG, "Camera permission granted");
                 try {
-                    //kalo ternyata gak ada kamera depan, tetep pake yg belakang
-                    if(useFrontCamera && cameraIds.length > 1){
-                        cameraId = cameraIds[1];
-                    }else{
-                        cameraId = cameraIds[0];
-                    }
                     cameraManager.openCamera(cameraId, cameraStateCallback, new Handler());
                 }catch (CameraAccessException e){
                     toast("Error accessing camera");
@@ -316,7 +317,7 @@ public class RealtimeDetectionActivity extends AppCompatActivity {
         isDetecting = true;
         int rotation = getRotationCompensation(cameraId, this, this);
 
-        image = FirebaseVisionImage.fromMediaImage(mediaImage, FirebaseVisionImageMetadata.ROTATION_0);
+        image = FirebaseVisionImage.fromMediaImage(mediaImage, getRotationCompensation(cameraId, this, this));
         Log.d(TAG, "Image Size "  + mediaImage.getWidth() + " " + mediaImage.getHeight());
         mediaImage.close();
 

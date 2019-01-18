@@ -19,8 +19,8 @@ public class AdHelper {
     private Context context;
     private InterstitialAd interstitialAd;
     private RewardedVideoAd rewardedVideoAd;
-    private static final String INTERSTITIAL_ID = "";
-    private static final String REWARDED_ID = "";
+    private static final String INTERSTITIAL_ID = "ca-app-pub-6204912690888371/6401115418";
+    private static final String REWARDED_ID = "ca-app-pub-6204912690888371/7998758807";
 
     private AdHelper(Context context){
         this.context = context;
@@ -56,62 +56,11 @@ public class AdHelper {
     private void SetupInterstitialAd(){
         interstitialAd = new InterstitialAd(context);
         interstitialAd.setAdUnitId(INTERSTITIAL_ID);
-        interstitialAd.setAdListener(new AdListener(){
-            @Override
-            public void onAdFailedToLoad(int errorCode) {
-                if(errorCode != 1){
-                    SetupInterstitialAd();
-                }
-            }
-        });
         interstitialAd.loadAd(new AdRequest.Builder().build());
     }
 
     private void SetupRewardedAd(){
         rewardedVideoAd = MobileAds.getRewardedVideoAdInstance(context);
-        rewardedVideoAd.setRewardedVideoAdListener(new RewardedVideoAdListener() {
-            @Override
-            public void onRewardedVideoAdLoaded() {
-
-            }
-
-            @Override
-            public void onRewardedVideoAdOpened() {
-
-            }
-
-            @Override
-            public void onRewardedVideoStarted() {
-
-            }
-
-            @Override
-            public void onRewardedVideoAdClosed() {
-
-            }
-
-            @Override
-            public void onRewarded(RewardItem rewardItem) {
-
-            }
-
-            @Override
-            public void onRewardedVideoAdLeftApplication() {
-
-            }
-
-            @Override
-            public void onRewardedVideoAdFailedToLoad(int i) {
-                if(i != 1){
-                    SetupRewardedAd();
-                }
-            }
-
-            @Override
-            public void onRewardedVideoCompleted() {
-
-            }
-        });
         rewardedVideoAd.loadAd(REWARDED_ID, new AdRequest.Builder().build());
     }
 }

@@ -68,7 +68,6 @@ public class RealtimeDetectionActivity extends AppCompatActivity {
     private RealtimeOverlay overlay;
     private boolean isLandscape, isInit = true;
     private int width, height;
-    private int totalFrame, detectedFrame;
 
     private void toast(String s){
         Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
@@ -192,7 +191,6 @@ public class RealtimeDetectionActivity extends AppCompatActivity {
                         }
                         isInit = false;
                     }
-                    totalFrame++;
                     if(isDetecting){
                         image.close(); //buang frame
                     }else{
@@ -213,7 +211,6 @@ public class RealtimeDetectionActivity extends AppCompatActivity {
         if(permissionCheck != PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, PERMISSION_REQ_CAM);
         }else{
-            Log.d(TAG, "Camera permission granted");
             try {
                 cameraManager.openCamera(cameraId, cameraStateCallback, new Handler());
             }catch (CameraAccessException e){
@@ -260,7 +257,6 @@ public class RealtimeDetectionActivity extends AppCompatActivity {
         //cek permission
         if (requestCode == PERMISSION_REQ_CAM){
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED){
-                Log.d(TAG, "Camera permission granted");
                 try {
                     cameraManager.openCamera(cameraId, cameraStateCallback, new Handler());
                 }catch (CameraAccessException e){
@@ -287,7 +283,6 @@ public class RealtimeDetectionActivity extends AppCompatActivity {
                 cameraDevice.createCaptureSession(sfl, new CameraCaptureSession.StateCallback() {
                     @Override
                     public void onConfigured(@NonNull CameraCaptureSession session) {
-                        Log.d(TAG, "Capture session configured");
                         captureSession = session;
 
                         try{
@@ -308,7 +303,6 @@ public class RealtimeDetectionActivity extends AppCompatActivity {
             }catch(CameraAccessException e){
                 e.printStackTrace();
             }
-            Log.d(TAG, "Camera preview started");
             isPreviewing = true;
         }
     }
@@ -318,7 +312,6 @@ public class RealtimeDetectionActivity extends AppCompatActivity {
         int rotation = getRotationCompensation(cameraId, this, this);
 
         image = FirebaseVisionImage.fromMediaImage(mediaImage, getRotationCompensation(cameraId, this, this));
-        Log.d(TAG, "Image Size "  + mediaImage.getWidth() + " " + mediaImage.getHeight());
         mediaImage.close();
 
         detector.detectInImage(image).addOnSuccessListener(new OnSuccessListener<List<FirebaseVisionFace>>() {
@@ -326,8 +319,6 @@ public class RealtimeDetectionActivity extends AppCompatActivity {
                                     public void onSuccess(List<FirebaseVisionFace> faces) {
                                         overlay.processResult(faces);
                                         isDetecting = false;
-                                        detectedFrame++;
-                                        Log.d(TAG, "Detection success " + detectedFrame + " from " + totalFrame);
                                     }
                                 }).addOnFailureListener(new OnFailureListener() {
                                     @Override

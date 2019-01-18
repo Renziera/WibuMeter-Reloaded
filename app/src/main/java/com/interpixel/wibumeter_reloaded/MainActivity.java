@@ -19,10 +19,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //TODO bagusin title bar
-        getSupportActionBar().setIcon(R.drawable.ic_photo_camera_black_24dp);
-        getSupportActionBar().setLogo(R.drawable.ic_photo_camera_black_24dp);
 
+        getSupportActionBar().setDisplayShowCustomEnabled(true);
+        getSupportActionBar().setCustomView(R.layout.action_bar);
 
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);

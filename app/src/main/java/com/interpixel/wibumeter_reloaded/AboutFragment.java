@@ -31,6 +31,13 @@ public class AboutFragment extends Fragment {
         String value = sp.getString("divergence", "0 . 1 7 3 0 0 3 4");
         divergence.setText(value);
 
+        view.findViewById(R.id.imageIcon).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AdHelper.getAdHelper().ShowAds();
+            }
+        });
+
         AdView adView = view.findViewById(R.id.adViewAbout);
         AdRequest adRequest = new AdRequest.Builder().build();
         adView.loadAd(adRequest);

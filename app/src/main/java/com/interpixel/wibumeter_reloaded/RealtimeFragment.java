@@ -11,6 +11,8 @@ import android.widget.RadioGroup;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
+import java.util.Random;
+
 import androidx.fragment.app.Fragment;
 
 public class RealtimeFragment extends Fragment {
@@ -39,6 +41,12 @@ public class RealtimeFragment extends Fragment {
         startRealtimeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Random random = new Random();
+                if(random.nextBoolean() && random.nextBoolean()){
+                    AdHelper.getAdHelper().ShowAds();
+                    return;
+                }
+
                 Intent intent = new Intent(getActivity(), RealtimeDetectionActivity.class);
                 if(radioCam.getCheckedRadioButtonId() == R.id.radio_front_cam){
                     intent.putExtra("front", true);

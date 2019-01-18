@@ -100,6 +100,10 @@ public class PhotoFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 pickPhoto();
+                Random random = new Random();
+                if(random.nextBoolean() && random.nextBoolean() && random.nextBoolean()){
+                    AdHelper.getAdHelper().ShowAds();
+                }
             }
         });
         view.findViewById(R.id.analyzeButton).setOnClickListener(new View.OnClickListener() {

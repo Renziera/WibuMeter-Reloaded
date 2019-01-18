@@ -2,20 +2,17 @@ package com.interpixel.wibumeter_reloaded;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
+import android.preference.PreferenceManager;
+import android.view.MenuItem;
 
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.util.Random;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-
-import android.preference.PreferenceManager;
-import android.util.Log;
-import android.view.MenuItem;
-
-import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -23,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        //TODO bagusin title bar
         getSupportActionBar().setIcon(R.drawable.ic_photo_camera_black_24dp);
         getSupportActionBar().setLogo(R.drawable.ic_photo_camera_black_24dp);
 
@@ -35,7 +32,8 @@ public class MainActivity extends AppCompatActivity {
 
         setDivergence();
 
-        MobileAds.initialize(this, "ca-app-pub-6204912690888371~3472410188");
+        AdHelper.setAdHelper(this);
+        AdHelper.getAdHelper().Initialize();
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener

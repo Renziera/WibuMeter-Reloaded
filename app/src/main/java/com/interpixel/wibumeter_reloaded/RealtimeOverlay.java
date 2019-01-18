@@ -8,7 +8,6 @@ import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.Typeface;
-import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -42,7 +41,6 @@ public class RealtimeOverlay {
 
             @Override
             public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-                Log.d("Hmm", "surfaceChanged: " + format + " width: " + width + " height: " + height);
             }
 
             @Override

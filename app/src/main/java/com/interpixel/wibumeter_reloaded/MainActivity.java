@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.MenuItem;
 
-import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.Random;
@@ -23,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
         //TODO bagusin title bar
         getSupportActionBar().setIcon(R.drawable.ic_photo_camera_black_24dp);
         getSupportActionBar().setLogo(R.drawable.ic_photo_camera_black_24dp);
+
 
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
